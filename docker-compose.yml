@@ -10,11 +10,18 @@ services:
       - jmes
     ports:
       - "26657:26657"
+      - "8085:26657"
+      - "26656:26656"
       - "1317:1317"
       - "9090:9090"
       - "9091:9091"
     expose:
       - "1317"
+      - "8085"
+      - "26656"
+      - "26657"
+      - "9090"
+      - "9091"
     command:
       - /bin/sh
       - -c
@@ -25,7 +32,7 @@ services:
         ./jmesd init --chain-id=jmes-888 devnode && ./jmesd add-genesis-account jmes1wrrjk4xurqk2ukaxr4hlrmsfgprxm075gnwacn 1000000ujmes
         yes "boost top desk keen unusual scene entire belt cargo protect subject donor front dose narrow fruit square despair chat crush visual reform river decorate" | ./jmesd gentx devnode 1000000ujmes --chain-id=jmes-888
         ./jmesd collect-gentxs
-        ./jmesd start
+        ./jmesd start --rpc.laddr tcp://0.0.0.0:26657
 
   faucet:
     container_name: faucet
@@ -48,9 +55,14 @@ services:
       - server_data:/opt
   proxy:
     container_name: webproxy
+    image: alexwerner/jmesworld-proxy:latest
     networks:
       - jmes
-    image: alexwerner/jmesworld-proxy:latest
+    environment:
+      - HOSTNAME_URI=jmesd:26657
+      - PROXY_PORT=1889
+    ports:
+      - "1889:1889"
 networks:
   jmes:
     driver: bridge

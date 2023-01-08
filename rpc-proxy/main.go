@@ -2,19 +2,36 @@ package main
 
 import (
 	"flag"
+	"os"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 var hostname string
 var port int
 
 func main() {
+
+    var hostnameURI = os.Getenv("HOSTNAME_URI")
+    if len(hostnameURI) == 0 {
+        hostnameURI = "http://localhost:26657"
+    }
+    var proxyPort, err = strconv.Atoi(os.Getenv("PROXY_PORT"))
+
+    if err != nil{
+        //executes if there is any error
+        fmt.Println(err)
+        proxyPort = 1889
+      }
+   if proxyPort == 0 {
+          proxyPort = 1889
+      }
 	// flags declaration using flag package
-	flag.StringVar(&hostname, "H", "http://localhost:26657", "Specify hostname")
-	flag.IntVar(&port, "p", 1889, "Specify port")
+	flag.StringVar(&hostname, "H", hostnameURI, "Specify hostname")
+	flag.IntVar(&port, "p", proxyPort, "Specify port")
 
 	flag.Parse() // after declaring flags we
 	http.HandleFunc("/", serveCorsProxy)
