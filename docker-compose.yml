@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  jmesd:
+    image: alexwerner/jmesworld-core:latest
+    #pull_policy: always
+    volumes:
+      - ./config:/root/.jmes/config
+    networks:
+      - jmes
+    ports:
+      - "26657:26657"
+      - "1317:1317"
+      - "9090:9090"
+      - "9091:9091"
+    expose:
+      - "1317"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /usr/local/bin
+        yes "boost top desk keen unusual scene entire belt cargo protect subject donor front dose narrow fruit square despair chat crush visual reform river decorate" | ./jmesd keys add devnode --recover
+        yes "boost top desk keen unusual scene entire belt cargo protect subject donor front dose narrow fruit square despair chat crush visual reform river decorate" | ./jmesd keys show devnode
+        ./jmesd init --chain-id=jmes-888 devnode && ./jmesd add-genesis-account jmes1wrrjk4xurqk2ukaxr4hlrmsfgprxm075gnwacn 1000000ujmes
+        yes "boost top desk keen unusual scene entire belt cargo protect subject donor front dose narrow fruit square despair chat crush visual reform river decorate" | ./jmesd gentx devnode 1000000ujmes --chain-id=jmes-888
+        ./jmesd collect-gentxs
+        ./jmesd start
+
+  faucet:
+    container_name: faucet
+    image: alexwerner/jmesworld-faucet:latest
+    networks:
+      - jmes
+    environment:
+      - HOSTNAME=jmesd
+      - HOSTPORT=1317
+    ports:
+      - "3002:3002"
+  webserver:
+    container_name: webserver
+    image: alexwerner/jmesworld-backend:latest
+    networks:
+      - jmes
+    ports:
+      - "3001:3001"
+    volumes:
+      - server_data:/opt
+  proxy:
+    container_name: webproxy
+    networks:
+      - jmes
+    image: alexwerner/jmesworld-proxy:latest
+networks:
+  jmes:
+    driver: bridge
+volumes:
+  server_data:
+  jmes_data_current:
