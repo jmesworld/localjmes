@@ -53,8 +53,8 @@ services:
       - "3001:3001"
     volumes:
       - server_data:/opt
-  proxy:
-    container_name: webproxy
+  proxy_jmesd:
+    container_name: proxy_jmesd
     image: alexwerner/jmesworld-proxy:latest
     networks:
       - jmes
@@ -63,6 +63,16 @@ services:
       - PROXY_PORT=1889
     ports:
       - "1889:1889"
+  proxy_lcdc:
+    container_name: proxy_lcdc
+    image: alexwerner/jmesworld-proxy:latest
+    networks:
+      - jmes
+    environment:
+      - HOSTNAME_URI=jmesd:1317
+      - PROXY_PORT=1888
+    ports:
+      - "1888:1888"
 networks:
   jmes:
     driver: bridge
