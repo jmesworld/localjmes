@@ -35,6 +35,7 @@ func main() {
 
 	flag.Parse() // after declaring flags we
 	http.HandleFunc("/", serveCorsProxy)
+    fmt.Printf("Proxy CORS from localhost:%d to: %v \n",port, hostname)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }
 
@@ -58,7 +59,11 @@ func serveCorsProxy(res http.ResponseWriter, req *http.Request) {
 		fmt.Printf("response read error: %v", err)
 		return
 	}
-	res.WriteHeader(response.StatusCode)
+	if req.Method == "OPTIONS"{
+	    res.WriteHeader(200)
+	}	else {
+        res.WriteHeader(response.StatusCode)
+	}
 	_, _ = res.Write(body)
 }
 
@@ -69,9 +74,9 @@ func setHeaders(src *http.Response, dest *http.ResponseWriter) {
 			header.Set(name, value)
 		}
 	}
-	header.Set("access-control-allow-headers", "Accept,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With")
-	header.Set("access-control-allow-methods", "GET, POST, OPTIONS")
-	header.Set("access-control-allow-origin", "*")
+	header.Set("Access-Control-Allow-Headers", "Accept,Authorization,Cache-Control,Content-Type,Content-Length,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-CSRF-Token,X-Requested-With,X-Auth-Token,append,delete,entries,foreach,get,has,keys,set,values")
+	header.Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+	header.Set("Access-Control-Allow-Origin", "*")
 	header.Set("access-control-expose-headers", "Content-Length,Content-Range")
 	header.Set("access-control-max-age", "1728000")
 }
